@@ -1,4 +1,4 @@
-## can't get my binomial to work! back to the example
+## can't get my binomial to work! back to the example https://turing.ml/dev/tutorials/2-logisticregression/
 
 # Bayesian logistic regression (LR)
 @model ber_trials(n, y, σ) = begin

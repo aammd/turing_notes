@@ -4,7 +4,7 @@ using DataFrames, StatsPlots
 
 using Gadfly
 
-using StatsFuns: logistic
+#using StatsFuns: logistic
 
 linknode_data = CSV.read("mangal_data.dat")
 
@@ -13,9 +13,9 @@ webdata = linknode_data[linknode_data.predation .> 0, :]
 
 @model binomial_links(nodes, links) = begin
     # intercept
-    β_0 ~ Normal(.57,0.09);
-    # slope
-    β_1 ~ Normal(1.73,0.09);
+    β_0 ~ Normal(.41,0.05);
+    # slope -- both from martinez
+    β_1 ~ Normal(1.54,0.05);
 
     # std of the response
     σ ~ Normal(0,1)
@@ -42,14 +42,15 @@ map(logistic, v)
 
 @model binomial_links(nodes, links) = begin
     # intercept
-    β_0 ~ Normal(1,0.5);
+    β_0 ~ Normal(0.41, 0.02)
     # slope
-    β_1 ~ Normal(0.5,0.5);
+    β_1 ~ Normal(-0.46, 0.02);
 
     max_links = nodes .^ 2
-
+    v = β_0 .* nodes .^ β_1
+    print(v)
     for i in 1:length(nodes)
-        links[i] ~ Binomial(max_links[i], logistic(β_0 * nodes[i] ^ β_1))
+        links[i] ~ Binomial(max_links[i], v[i])
     end
     return links
 end
@@ -83,16 +84,19 @@ rand(Beta(0.5, 0.5))
 
 @model betabinomial_links(nodes, links) = begin
     # intercept
-    β_0 ~ Normal(1,0.2);
+    β_0 ~ Normal(0.41, 0.02)#Normal(1,0.2);
     # slope
-    β_1 ~ Normal(0.2,0.2);
+    β_1 ~ Normal(-0.46, 0.02);
     # dispersion
     ϕ ~ Exponential(6)
 
     max_links = nodes .^ 2
+    v = β_0 .* nodes .^ β_1
+    #v = map(logistic, v_logit)
+    #print(v)
+    print(ϕ)
     for i in 1:length(links)
-        v = logistic(β_0 * nodes[i] ^ β_1)
-        links[i] ~ BetaBinomial(max_links[i], v * ϕ, (1 - v) * ϕ)
+        links[i] ~ BetaBinomial(max_links[i], v[i] * ϕ, (1 - v[i]) * ϕ)
     end
     return links
 end

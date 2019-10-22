@@ -1,7 +1,7 @@
 using Gen;
 using PyPlot
 
-xs = [-5., -4., -3., -.2, -1., 0., 1., 2., 3., 4., 5.];
+xs = [-5., -4., -3., -.2, -1., 0., 1., 2., 3., 4., 5.]
 
 @gen function line_model(xs::Vector{Float64})
     n = length(xs)
