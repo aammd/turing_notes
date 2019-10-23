@@ -1,6 +1,6 @@
 using Turing, Distributions, CSV
 
-using DataFrames, StatsPlots
+using DataFrames
 
 using Gadfly
 
