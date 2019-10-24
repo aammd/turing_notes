@@ -298,9 +298,9 @@ version = "0.2.0"
 
 [[IRTools]]
 deps = ["InteractiveUtils", "MacroTools", "Test"]
-git-tree-sha1 = "e23faa71b8f54c3fdc99b230b9c2906cafdddca5"
+git-tree-sha1 = "72421971e60917b8cd7737f9577c4f0f87eab306"
 uuid = "7869d1d1-7146-5819-86e3-90919afe41df"
-version = "0.2.3"
+version = "0.3.0"
 
 [[IndirectArrays]]
 deps = ["Compat", "Test"]
@@ -736,13 +736,7 @@ uuid = "efce3f68-66dc-5838-9240-27a6d6f5f9b6"
 version = "0.4.1"
 
 [[Zygote]]
-deps = ["DiffRules", "FFTW", "FillArrays", "ForwardDiff", "IRTools", "InteractiveUtils", "LinearAlgebra", "MacroTools", "NNlib", "NaNMath", "Random", "Requires", "SpecialFunctions", "Statistics", "ZygoteRules"]
-git-tree-sha1 = "d21e86576e25e4adc09631b34651798775fba99a"
+deps = ["DiffRules", "ForwardDiff", "IRTools", "InteractiveUtils", "LinearAlgebra", "MacroTools", "NNlib", "NaNMath", "Random", "Requires", "SpecialFunctions", "Statistics"]
+git-tree-sha1 = "7f31d606965a9c37f6ddf06c9082b17370e0eb7e"
 uuid = "e88e6eb3-aa80-5325-afca-941959d7151f"
-version = "0.3.4"
-
-[[ZygoteRules]]
-deps = ["MacroTools"]
-git-tree-sha1 = "def5f96ac2895fd9b48435f6b97020979ee0a4c6"
-uuid = "700de1a5-db45-46bc-99cf-38207098b444"
-version = "0.1.0"
+version = "0.3.0"
