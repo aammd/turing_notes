@@ -1,61 +1,57 @@
 using Turing, Distributions, CSV
+#using AdvancedHMC
 
 using DataFrames
 
 using Gadfly
-
-#using StatsFuns: logistic
 
 linknode_data = CSV.read("mangal_data.dat")
 
 # select just webs where predation is positive
 webdata = linknode_data[linknode_data.predation .> 0, :]
 
+webdata
+nobig_web=filter(x -> x[:nodes]<700, webdata)
+# or
+webdata[webdata.nodes.<700,:]
 ####
-
+# must use a truncated exponential, see example at https://github.com/StatisticalRethinkingJulia/TuringModels.jl/blob/master/chapters/11/m11.5t.jl
 @model betabinomial_links_eq(nodes, links) = begin
     # intercept
     a ~ Normal(-2, 0.1)#Normal(1,0.2);
     # slope
     b ~ Normal(-0.2, 0.1);
     # dispersion
-    ϕ_0 ~ Normal(-2,0.5)
-    ϕ_1 ~ Normal(0.1,0.1)
+    #ϕ_0 ~ Normal(-2,0.5)
+    #ϕ_1 ~ Normal(0.1,0.1)
+    ϕ ~ Truncated(Exponential(6), 0, Inf)
 
     max_links = nodes .^ 2
     v = ((nodes .- 1) ./ nodes.^2) .+ ( (nodes.^2 .- nodes .+ 1) .* exp.(a) .* nodes .^(b .- 2) ) ./ ( 1 .+ exp.(a) .* nodes .^ b)
-    ϕ = ϕ_0 .+ ϕ_1 .* (nodes) 
+
     #print(v)
     for i in 1:length(links)
-        links[i] ~ BetaBinomial(max_links[i], v[i] * exp(ϕ[i]), (1 - v[i]) * exp(ϕ[i]))
+        links[i] ~ BetaBinomial(max_links[i], v[i] * ϕ, (1 - v[i]) * ϕ )
     end
     return links
 end
 
 
 ## prior predictive
-link_gen = betabinomial_links_eq(nodes = webdata.nodes,
+link_gen = betabinomial_links_eq(nodes = nobig_web,
                           links = fill(missing, length(webdata.nodes)))
 ## add data to the function so it can make calculations
 link_gen()
 webdata_prior_predict = select(webdata, :nodes)
 
+links_with_data = betabinomial_links_eq(nodes = nobig_web.nodes,
+ links = nobig_web.links)
+links_with_data()
+
+chains_data = sample(links_with_data, NUTS(4000, 1000, 0.9))
+
+
 webdata_prior_predict.links = link_gen()
 Gadfly.plot(webdata_prior_predict,
             x = :nodes, y = :links,
             Geom.point,  Scale.y_log10, Scale.x_log10())
-
-
-# sampling
-
-links_with_data = betabinomial_links_eq(nodes = webdata.nodes,
- links = webdata.links)
-links_with_data()
-
-chains_data = sample(links_with_data, HMC(0.05, 10), 2000)
-
-chains_data
-
-function constrained_logistic(a,b)
- ((nodes .- 1) ./ nodes.^2) .+ ( (nodes.^2 .- nodes .+ 1) .* exp.(a) .* nodes .^(b .- 2) ) ./ ( 1 .+ exp.(a) .* nodes .^ b)
-end
