@@ -9,6 +9,8 @@ linknode_data = CSV.read("mangal_data.dat")
 # select just webs where predation is positive
 webdata = linknode_data[linknode_data.predation .> 0, :]
 
+# do this to get the random prop constants https://github.com/StatisticalRethinkingJulia/TuringModels.jl/blob/master/chapters/12/m12.6t.jl#L22
+
 ####
 
 @model multinomial_links(nodes, links) = begin
