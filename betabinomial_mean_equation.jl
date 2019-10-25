@@ -1,8 +1,7 @@
-using Turing, Distributions, CSV
-#using AdvancedHMC
-
-using DataFrames
-
+import Distributions
+import CSV
+import DataFrames
+import Turing
 using Gadfly
 
 linknode_data = CSV.read("mangal_data.dat")
@@ -38,7 +37,7 @@ end
 
 
 ## prior predictive
-link_gen = betabinomial_links_eq(nodes = nobig_web,
+link_gen = betabinomial_links_eq(nodes = webdata.nodes,
                           links = fill(missing, length(webdata.nodes)))
 ## add data to the function so it can make calculations
 link_gen()
@@ -48,8 +47,11 @@ links_with_data = betabinomial_links_eq(nodes = nobig_web.nodes,
  links = nobig_web.links)
 links_with_data()
 
-chains_data = sample(links_with_data, NUTS(4000, 1000, 0.9))
+chains_data = sample(links_with_data, HMCDA(200, 0.65, 0.3), 2000)
+chains_data
 
+
+# use cool mapping techniques to produce posterior
 
 webdata_prior_predict.links = link_gen()
 Gadfly.plot(webdata_prior_predict,
